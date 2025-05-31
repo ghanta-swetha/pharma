@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/assets/Header/logo22.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spansules Pharma</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- Inside the <head> tag -->
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+<!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'spansules-green': '#008000',
+              'gray-900': '#363636',
+            },
+            fontFamily: {
+              'quicksand': ['Quicksand', 'sans-serif'],
+              'roboto': ['Roboto', 'sans-serif'],
+            },
+            spacing: {
+              '160': '160px',
+              '32': '32px',
+            }
+          },
+        },
+      }
+    </script>
+    <style type="text/tailwindcss">
+      @layer components {
+        .nav-link {
+          @apply text-gray-900 font-roboto text-base font-medium hover:text-spansules-green transition-colors;
+        }
+        .nav-link.active {
+          @apply text-spansules-green;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
