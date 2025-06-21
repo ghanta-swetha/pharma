@@ -114,6 +114,7 @@ const Newproducts = () => {
                 ['MESALAZINE', '70% w/w'],
                 ['METOPROLOL SUCCINATE', '30% w/w'],
                 ['MEMANTINE', '70%'],
+                ['TROSPIUM CHLORIDE IR','16% w/w'],
                 ['NITROGLYCERIN', '2.4%'],
                 ['SILDENAFIL CITRATE', '20%'],
                 ['SERTRALINE', '20%'],

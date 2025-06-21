@@ -71,9 +71,9 @@ const AntiBPH = () => {
           <table className="w-full border border-gray-300 text-xs sm:text-sm md:text-base">
             <tbody>
               {[
-                ['Tamsulosin pellets SR', '0.1%, 0.16% & 0.2%'],
-                ['Dutasteride IR pellets', '0.5%'],
-                ['Finasteride IR pellets', '6.5%'],
+                ['Tamsulosin pellets SR', '0.1%, 0.13%, 0.144%, 0.16%, 0.2% w/w'],
+                ['Dutasteride IR pellets', ' 0.5% w/w'],
+                ['Finasteride IR pellets', '	6.5% w/w'],
                 // ['Tamsulosin HCL pellets', '0.12%, 0.16%, 0.2%, 0.4%'],
                 // ['Tamsulosin 0.4mg + Dutasteride 0.5mg blend pellets', '-'],
               ].map(([medicine, dosage], index) => (

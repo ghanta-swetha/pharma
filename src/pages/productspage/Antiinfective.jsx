@@ -72,11 +72,11 @@ const Antiinfective = () => {
           <table className="w-full border border-gray-300 text-xs sm:text-sm md:text-base">
             <tbody>
               {[
-                ['Itraconazole Pellets', '22%, 20%, 22.7%, 40%, 44%'],
+                ['Itraconazole Pellets', '22%, '],
                 // ['Itraconazole Granules', '22%, 18%, 22.7%, 40%'],
-                ['Doxycycline Hyclate', '41% & 60%, 25%, 26.5%, 33%, 35%'],
+                ['Doxycycline Hyclate', '41% & 60%,'],
                 ['Secnidazole Pellets', '50%'],
-                ['Fluconazole Pellets', '41.6%'],
+                ['Fluconazole Pellets', '41.60% w/w'],
                 // ['Roxithromycin EC pellets', '54.5%'],
               ].map(([product, composition], index) => (
                 <tr key={index}>

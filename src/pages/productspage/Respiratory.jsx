@@ -78,12 +78,12 @@ const Respiratory = () => {
             <tbody>
               {[
                 ['Theophylline Pellets', '60%'],
-    ['Ambroxol Pellets', '28%, 40%'],
+    ['Ambroxol Pellets', ' 30%&7.5%'],
     ['Salbutamol Sulphate', '8 mg'],
-    ['Phenylephrine Pellets', '40%, 10%'],
+    ['Phenylephrine Pellets', '40%'],
     ['Levocetirizine Pellets', '0.5%'],
     ['Phenylpropanolamine HCl + Chlorpheniramine Maleate SR', '(50 mg + 8 mg)'],
-    ['Phenylpropanolamine HCl + Chlorpheniramine Maleate SR', '(5 mg + 4 mg)'],
+    ['Phenylpropanolamine HCl + Chlorpheniramine Maleate SR', '(25 mg + 4 mg)'],
     // ['Doxophylline Pellets', '—'],
               ].map(([medicine, dosage], index) => (
                 <tr key={index}>

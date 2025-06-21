@@ -78,7 +78,7 @@ const Antiobesity = () => {
             <tbody>
               <tr>
                 <td className="border border-gray-300 px-2 py-2">Orlistat Pellets IR</td>
-                <td className="border border-gray-300 px-2 py-2">25% &amp; 50%</td>
+                <td className="border border-gray-300 px-2 py-2">17%, 25%,40% & 50% w/w</td>
               </tr>
             </tbody>
           </table>

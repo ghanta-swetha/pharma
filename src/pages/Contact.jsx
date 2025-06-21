@@ -524,7 +524,7 @@ const Contact = () => {
     >
       <img src="/assets/contactpage/EnvelopeOpen.png" alt="Email" className="w-5 h-5" />
     </div>
-    <h3 className="text-black text-lg sm:text-center md:text-xl font-bold font-[Quicksand] md:text-center">Email Address</h3>
+    <h3 className="text-black text-lg sm:text-center md:text-xl font-bold font-[Quicksand] md:text-center">Email Address</h3>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
     <p className="text-black text-sm md:text-base font-[Roboto] mt-2">info@spsnulespharma.com</p>
   </div>
 </div>

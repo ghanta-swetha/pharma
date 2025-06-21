@@ -1,23 +1,16 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useNavigate } from "react-router-dom" // Changed from next/navigation
+import { useNavigate } from "react-router-dom"
 
 function HeroPage() {
-  const navigate = useNavigate() // Changed from useRouter
+  const navigate = useNavigate()
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [nextImageIndex, setNextImageIndex] = useState(0)
   const [isTransitioning, setIsTransitioning] = useState(false)
-  const [imagesLoaded, setImagesLoaded] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-  const [currentImages, setCurrentImages] = useState([])
 
-  // Image sets for different breakpoints
-  const imageSets = {
-    desktop: ["/assets/Heropage/image1.png", "/assets/Heropage/image2.png", "/assets/Heropage/image3.png"],
-    medium: ["/assets/Heropage/mediumimage1.png", "/assets/Heropage/mediumimage2.png", "/assets/Heropage/mediumimage3.png"],
-    small: ["/assets/Heropage/smallimage1.png", "/assets/Heropage/smallimage2.png", "/assets/Heropage/smallimage3.png"],
-  }
+  // Single set of images for all breakpoints (using desktop images for consistency)
+  const currentImages = ["/assets/Heropage/image1.png", "/assets/Heropage/image2.png", "/assets/Heropage/image3.png"]
 
   // Content for each slide
   const slideContent = [
@@ -37,73 +30,26 @@ function HeroPage() {
     },
   ]
 
-  // Determine the appropriate image set based on screen size
-  const updateImageSet = () => {
-    const width = window.innerWidth
-    if (width >= 1024) {
-      setCurrentImages(imageSets.desktop)
-    } else if (width >= 768) {
-      setCurrentImages(imageSets.medium)
-    } else {
-      setCurrentImages(imageSets.small)
-    }
-  }
-
-  // Initial image set and resize listener
-  useEffect(() => {
-    updateImageSet()
-    window.addEventListener("resize", updateImageSet)
-    return () => window.removeEventListener("resize", updateImageSet)
-  }, [])
-
-  // Preload images
-  useEffect(() => {
-    setIsLoading(true)
-
-    const imagePromises = currentImages.map((src) => {
-      return new Promise((resolve, reject) => {
-        const img = new Image()
-        img.src = src
-        img.onload = resolve
-        img.onerror = reject
-        img.crossOrigin = "anonymous" // Avoid CORS issues
-      })
-    })
-
-    Promise.all(imagePromises)
-      .then(() => {
-        setImagesLoaded(true)
-        setIsLoading(false)
-      })
-      .catch((error) => {
-        console.error("Error preloading images:", error)
-        setIsLoading(false) // Still show content even if some images fail
-      })
-  }, [currentImages])
-
   // Handle smooth image transitions
   const transitionToNextImage = (nextIndex) => {
     setNextImageIndex(nextIndex)
     setIsTransitioning(true)
 
-    // After transition completes, update current image
     setTimeout(() => {
       setCurrentImageIndex(nextIndex)
       setIsTransitioning(false)
-    }, 10) // Match this with the CSS transition duration
+    }, 10)
   }
 
-  // Set up the image rotation interval after images are loaded
+  // Set up the image rotation interval
   useEffect(() => {
-    if (!imagesLoaded) return
-
     const interval = setInterval(() => {
       const nextIndex = (currentImageIndex + 1) % currentImages.length
       transitionToNextImage(nextIndex)
     }, 5000)
 
     return () => clearInterval(interval)
-  }, [imagesLoaded, currentImageIndex, currentImages])
+  }, [currentImageIndex])
 
   // Handle manual navigation
   const goToSlide = (index) => {
@@ -113,18 +59,7 @@ function HeroPage() {
 
   // Handle navigation to contact page
   const handleContactNavigation = () => {
-    navigate('/contact') // Changed from router.push
-  }
-
-  if (isLoading) {
-    return (
-      <div className="relative flex justify-center items-center h-[500px] md:h-[600px] lg:h-[744px] bg-gray-100">
-        <div className="flex flex-col items-center">
-          <div className="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
-          <p className="mt-4 text-gray-700 text-sm md:text-base lg:text-lg">Loading...</p>
-        </div>
-      </div>
-    )
+    navigate('/contact')
   }
 
   return (
@@ -198,10 +133,6 @@ function HeroPage() {
               <svg
                 width="24"
                 height="24"
-                md:width="26"
-                md:height="26"
-                lg:width="28"
-                lg:height="28"
                 viewBox="0 0 28 28"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
@@ -216,7 +147,7 @@ function HeroPage() {
           </a>
         </div>
 
-        {/* Chat/Support Icon (white circle) - Updated with navigation */}
+        {/* Chat/Support Icon */}
         <div
           className="absolute bottom-4 right-4 md:bottom-6 md:right-6 lg:bottom-6 lg:right-6 z-20"
           style={{

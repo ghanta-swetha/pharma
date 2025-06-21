@@ -15,9 +15,9 @@ const Footer = () => {
   // Social media icons with dummy links
   const socialIcons = [
     { name: "Facebook", icon: "/assets/homepage/socialicon1.png", link: "https://www.facebook.com/people/Spansules-Pharmatech/100064027470727/?modal=admin_todo_tour#" },
-    { name: "Twitter", icon: "/assets/homepage/socialicon2.png", link: "https://twitter.com/spansulespharma" },
+    { name: "Twitter", icon: "/assets/homepage/socialicon2.png", link: "" },
     { name: "LinkedIn", icon: "/assets/homepage/socialicon3.png", link: "https://www.linkedin.com/in/spansules-pharmatech/" },
-    { name: "Instagram", icon: "/assets/homepage/socialicon4.png", link: "https://instagram.com/spansulespharma" },
+    { name: "Instagram", icon: "/assets/homepage/socialicon4.png", link: "https://twitter.com/spansulespharma" },
   ];
 
   return (
@@ -64,8 +64,8 @@ const Footer = () => {
                 />
               </svg>
             </div>
-            <p className="text-sm mb-1 text-center">91 - 40 - 66679999</p>
-            <p className="text-sm mb-1 text-center">91 - 40 - 23204043</p>
+            <p className="text-sm mb-1 text-center">91 - 40 - 46679999</p>
+            <p className="text-sm mb-1 text-center">91 - 40 - 23050443</p>
             <p className="text-sm text-center">91 - 9963214566</p>
           </div>
 

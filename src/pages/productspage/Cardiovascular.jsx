@@ -77,7 +77,7 @@ const Cardiovascular = () => {
             </thead>
             <tbody>
               {[
-                ['Diltiazem HCl SR Pellets', '60%, 40%, 50%'],
+                ['Diltiazem HCl SR Pellets', '44%, 60% & 66%'],
                 ['Propranolol HCl Pellets', '10%, 10.5%, 21% & 31%'],
                 // ['Nifedipine Pellets', '10%, 11%'],
               ].map(([medicine, dosage], index) => (

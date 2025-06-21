@@ -76,7 +76,7 @@ const App = () => {
     { name: "Pakistan", flag: "/assets/wherearewe/pakisthan.png" },
     { name: "Syria", flag: "/assets/wherearewe/syria.png" },
     { name: "Tunisia", flag: "/assets/wherearewe/tunisia.png" },
-    { name: "Kenya", flag: "/assets/wherearewe/kenya.png" },
+    // { name: "Kenya", flag: "/assets/wherearewe/kenya.png" },
   ];
 
   const southEastAsiaCountries = [

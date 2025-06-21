@@ -71,7 +71,7 @@ const Antihyperlipidemic = () => {
           <table className="w-full border border-gray-300 text-xs sm:text-sm md:text-base">
             <tbody>
               {[
-                ['Atorvastatin IR pellets', '7.5%, 10%, 15%, 20%'],
+                ['Atorvastatin IR pellets', '1%, 2%, 10%, 20% w/w'],
                 ['PRAVASTATINPELLETS IR pellets', '20% w/w'],
                 ['Rosuvastatin HCL pellets', '20%  w/w'],
               ].map(([medicine, dosage], index) => (

@@ -71,9 +71,9 @@ const AntiPsychotic = () => {
           <table className="w-full border border-gray-300 text-xs sm:text-sm md:text-base">
             <tbody>
               <tr>
-  <td className="border border-gray-300 px-2 py-2">Levosulpiride SR Pellets</td>
-  <td className="border border-gray-300 px-2 py-2">40% & 50% w/w</td>
-</tr>
+                <td className="border border-gray-300 px-2 py-2">Levosulpiride SR Pellets</td>
+                <td className="border border-gray-300 px-2 py-2">40% & 50% w/w</td>
+              </tr>
 
             </tbody>
           </table>

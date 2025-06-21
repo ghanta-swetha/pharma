@@ -84,7 +84,7 @@ const Equipmentpage = () => {
               alt="SCREW EXTRUDER & SPHERONIZER"
               className="w-full h-auto"
             />
-            <p className="text-center text-xs mt-1">SCREW EXTRUDER & SPHERONIZER</p>
+            <p className="text-center text-xs mt-1">SCREW EXTRUDER & SPHERONIZER</p>                            
           </div>
         </div>
 

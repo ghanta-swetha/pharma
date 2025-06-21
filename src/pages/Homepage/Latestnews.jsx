@@ -93,7 +93,7 @@ const Card = ({ card, navigate, isLgScreen }) => (
       </svg>
       <span className={`text-xs ${isLgScreen ? 'font-bold' : 'font-semibold'} ml-1`}>{card.admin}</span>
       <span className="mx-2 text-xs">•</span>
-      <span className={`text-xs ${isLgScreen ? 'font-bold' : 'font-semibold'}`}>{card.date}</span>
+      <span className={`text-xs ${isLgScreen ? 'font-bold' : 'font-semibold'}`}>{card.date}</span> 
     </div>
 
     {/* Title */}

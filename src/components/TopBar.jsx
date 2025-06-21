@@ -6,7 +6,6 @@ const TopBar = () => {
   const [language, setLanguage] = useState("English")
   const [translatorReady, setTranslatorReady] = useState(false)
 
-  // Comprehensive language map to Google Translate codes
   const languageMap = {
     Afrikaans: "af",
     Albanian: "sq",
@@ -146,15 +145,12 @@ const TopBar = () => {
 
   const languages = Object.keys(languageMap)
 
-  // Load Google Translate script once on mount
   useEffect(() => {
-    // Check if Google Translate is already loaded
     if (window.google?.translate) {
       setTranslatorReady(true)
       return
     }
 
-    // Create a global callback function that Google Translate will call
     window.googleTranslateElementInit = () => {
       new window.google.translate.TranslateElement(
         {
@@ -168,19 +164,15 @@ const TopBar = () => {
       setTranslatorReady(true)
     }
 
-    // Add Google Translate script
     const script = document.createElement("script")
     script.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
     script.async = true
     script.defer = true
-
     script.onerror = () => {
       console.error("Failed to load Google Translate script")
     }
-
     document.body.appendChild(script)
 
-    // Cleanup function
     return () => {
       if (window.googleTranslateElementInit) {
         delete window.googleTranslateElementInit
@@ -199,32 +191,24 @@ const TopBar = () => {
 
     const langCode = languageMap[selectedLang]
 
-    // Direct method to change language using Google Translate API
-    if (window.google?.translate?.TranslateElement) {
-      // Try to use the direct API method first
-      try {
-        const translateElement = document.querySelector("#google_translate_element")
-        const iframe = translateElement?.querySelector("iframe")
-        const iframeDoc = iframe?.contentWindow?.document
-
-        if (iframeDoc) {
-          const dropdown = iframeDoc.querySelector(".goog-te-combo")
-          if (dropdown) {
-            dropdown.value = langCode
-            dropdown.dispatchEvent(new Event("change"))
-            return
-          }
+    try {
+      const translateElement = document.querySelector("#google_translate_element")
+      const iframe = translateElement?.querySelector("iframe")
+      const iframeDoc = iframe?.contentWindow?.document
+      if (iframeDoc) {
+        const dropdown = iframeDoc.querySelector(".goog-te-combo")
+        if (dropdown) {
+          dropdown.value = langCode
+          dropdown.dispatchEvent(new Event("change"))
+          return
         }
-      } catch (error) {
-        console.error("Error accessing Google Translate iframe:", error)
       }
+    } catch (error) {
+      console.error("Error accessing Google Translate iframe:", error)
     }
 
-    // Fallback method - find the Google Translate dropdown directly
     try {
-      // Try multiple selectors as Google might change their structure
       const selectors = [".goog-te-combo", ".skiptranslate .goog-te-combo", "select.goog-te-combo"]
-
       let googleSelect = null
       for (const selector of selectors) {
         googleSelect = document.querySelector(selector)
@@ -235,7 +219,6 @@ const TopBar = () => {
         googleSelect.value = langCode
         googleSelect.dispatchEvent(new Event("change", { bubbles: true }))
       } else {
-        // Last resort - use the cookie method
         document.cookie = `googtrans=/en/${langCode}; path=/; domain=${window.location.hostname}`
         window.location.reload()
       }
@@ -245,127 +228,139 @@ const TopBar = () => {
   }
 
   return (
-    <div className="w-full bg-gray-50 py-2 sm:py-3">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Small screens (default) layout */}
-        <div className="flex flex-col justify-between items-center text-center sm:flex md:hidden">
-          {/* Welcome Text */}
-          <div className="text-spansules-green font-['Quicksand'] text-sm sm:text-base font-bold">
-            Welcome to our SPANSULES
+    <>
+      <style global jsx>{`
+        #google_translate_element,
+        .goog-te-banner-frame,
+        .goog-te-menu-frame,
+        .goog-te-gadget,
+        .goog-te-combo,
+        .goog-te-menu2,
+        .skiptranslate {
+          display: none !important;
+          visibility: hidden !important;
+          height: 0 !important;
+          width: 0 !important;
+          overflow: hidden !important;
+        }
+
+        body {
+          top: 0 !important;
+        }
+
+        select.notranslate {
+          display: block !important;
+          visibility: visible !important;
+        }
+      `}</style>
+
+      <div className="w-full bg-gray-50 py-2 sm:py-3">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Small screens */}
+          <div className="flex flex-col justify-between items-center text-center sm:flex md:hidden">
+            <div className="text-spansules-green font-['Quicksand'] text-sm sm:text-base font-bold">
+              Welcome to our SPANSULES
+            </div>
+            <div className="flex text-spansules-green flex-col font-semibold items-center text-xs sm:text-sm my-2 space-y-1">
+              <span>WHO GMP Certified Company</span>
+              <span>ISO 9001:2015 Certified Company</span>
+            </div>
+            <div className="mt-2 w-full">
+              <div className="notranslate">
+                <select
+                  value={language}
+                  onChange={handleLanguageChange}
+                  className="border border-black bg-white px-2 sm:px-3 py-1 font-roboto text-sm sm:text-base font-semibold appearance-none pr-8 relative cursor-pointer w-full sm:w-[197px]"
+                  style={{
+                    backgroundImage:
+                      'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2014%2014%22%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M7%2010L0%203h14z%22%2F%3E%3C%2Fsvg%3E")',
+                    backgroundRepeat: "no-repeat",
+                    backgroundPosition: "right 8px center",
+                    backgroundSize: "9px",
+                  }}
+                >
+                  <option value="English">Select Language</option>
+                  {languages.map((lang) => (
+                    <option key={lang} value={lang}>
+                      {lang}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
           </div>
 
-          {/* Certifications */}
-          <div className="flex text-spansules-green flex-col font-semibold items-center text-xs sm:text-sm my-2 space-y-1">
-            <span>WHO GMP Certified Company</span>
-            <span>ISO 9001:2015 Certified Company</span>
+          {/* Medium screens */}
+          <div className="hidden md:flex md:flex-col md:items-center md:justify-center md:text-center md:space-y-2 lg:hidden">
+            <div className="text-spansules-green font-['Quicksand'] text-base font-bold">Welcome to our SPANSULES</div>
+            <div className="text-spansules-green font-semibold text-sm">
+              <span>WHO GMP Certified Company</span>
+              <span className="mx-2">|</span>
+              <span>ISO 9001:2015 Certified Company</span>
+            </div>
+            <div className="mt-1 w-auto">
+              <div className="notranslate">
+                <select
+                  value={language}
+                  onChange={handleLanguageChange}
+                  className="border border-black bg-white px-3 py-1 font-roboto text-base font-semibold appearance-none pr-8 relative cursor-pointer w-[250px]"
+                  style={{
+                    backgroundImage:
+                      'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2014%2014%22%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M7%2010L0%203h14z%22%2F%3E%3C%2Fsvg%3E")',
+                    backgroundRepeat: "no-repeat",
+                    backgroundPosition: "right 8px center",
+                    backgroundSize: "9px",
+                  }}
+                >
+                  <option value="English">Select Language</option>
+                  {languages.map((lang) => (
+                    <option key={lang} value={lang}>
+                      {lang}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
           </div>
 
-          {/* Language Selector */}
-          <div className="mt-2 w-full">
-            <div className="notranslate">
-              <select
-                value={language}
-                onChange={handleLanguageChange}
-                className="border border-black bg-white px-2 sm:px-3 py-1 font-roboto text-sm sm:text-base font-semibold appearance-none pr-8 relative cursor-pointer w-full sm:w-[197px]"
-                style={{
-                  backgroundImage:
-                    'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2014%2014%22%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M7%2010L0%203h14z%22%2F%3E%3C%2Fsvg%3E")',
-                  backgroundRepeat: "no-repeat",
-                  backgroundPosition: "right 8px center",
-                  backgroundSize: "9px",
-                }}
-              >
-                <option value="English">Select Language</option>
-                {languages.map((lang) => (
-                  <option key={lang} value={lang}>
-                    {lang}
-                  </option>
-                ))}
-              </select>
+          {/* Large screens */}
+          <div className="hidden lg:flex lg:flex-row lg:justify-between lg:items-center lg:text-left">
+            <div className="text-spansules-green font-['Quicksand'] text-base font-bold">Welcome to our SPANSULES</div>
+            <div className="flex text-spansules-green flex-row font-semibold items-center text-sm my-0 space-y-0">
+              <span>WHO GMP Certified Company</span>
+              <span className="text-spansules-green mx-2">|</span>
+              <span>ISO 9001:2015 Certified Company</span>
+            </div>
+            <div className="mt-0 w-auto">
+              <div className="notranslate">
+                <select
+                  value={language}
+                  onChange={handleLanguageChange}
+                  className="border border-black bg-white px-3 py-1 font-roboto text-base font-semibold appearance-none pr-8 relative cursor-pointer w-[197px]"
+                  style={{
+                    backgroundImage:
+                      'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2014%2014%22%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M7%2010L0%203h14z%22%2F%3E%3C%2Fsvg%3E")',
+                    backgroundRepeat: "no-repeat",
+                    backgroundPosition: "right 8px center",
+                    backgroundSize: "9px",
+                  }}
+                >
+                  <option value="English">Select Language</option>
+                  {languages.map((lang) => (
+                    <option key={lang} value={lang}>
+                      {lang}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Medium screens (md) layout - exactly as in the image */}
-        <div className="hidden md:flex md:flex-col md:items-center md:justify-center md:text-center md:space-y-2 lg:hidden">
-          {/* Welcome Text */}
-          <div className="text-spansules-green font-['Quicksand'] text-base font-bold">Welcome to our SPANSULES</div>
-
-          {/* Certifications */}
-          <div className="text-spansules-green font-semibold text-sm">
-            <span>WHO GMP Certified Company</span>
-            <span className="mx-2">|</span>
-            <span>ISO 9001:2015 Certified Company</span>
-          </div>
-
-          {/* Language Selector */}
-          <div className="mt-1 w-auto">
-            <div className="notranslate">
-              <select
-                value={language}
-                onChange={handleLanguageChange}
-                className="border border-black bg-white px-3 py-1 font-roboto text-base font-semibold appearance-none pr-8 relative cursor-pointer w-[250px]"
-                style={{
-                  backgroundImage:
-                    'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2014%2014%22%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M7%2010L0%203h14z%22%2F%3E%3C%2Fsvg%3E")',
-                  backgroundRepeat: "no-repeat",
-                  backgroundPosition: "right 8px center",
-                  backgroundSize: "9px",
-                }}
-              >
-                <option value="English">Select Language</option>
-                {languages.map((lang) => (
-                  <option key={lang} value={lang}>
-                    {lang}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
-
-        {/* Large screens (lg) layout */}
-        <div className="hidden lg:flex lg:flex-row lg:justify-between lg:items-center lg:text-left">
-          {/* Welcome Text */}
-          <div className="text-spansules-green font-['Quicksand'] text-base font-bold">Welcome to our SPANSULES</div>
-
-          {/* Certifications */}
-          <div className="flex text-spansules-green flex-row font-semibold items-center text-sm my-0 space-y-0">
-            <span>WHO GMP Certified Company</span>
-            <span className="text-spansules-green mx-2">|</span>
-            <span>ISO 9001:2015 Certified Company</span>
-          </div>
-
-          {/* Language Selector */}
-          <div className="mt-0 w-auto">
-            <div className="notranslate">
-              <select
-                value={language}
-                onChange={handleLanguageChange}
-                className="border border-black bg-white px-3 py-1 font-roboto text-base font-semibold appearance-none pr-8 relative cursor-pointer w-[197px]"
-                style={{
-                  backgroundImage:
-                    'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2014%2014%22%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M7%2010L0%203h14z%22%2F%3E%3C%2Fsvg%3E")',
-                  backgroundRepeat: "no-repeat",
-                  backgroundPosition: "right 8px center",
-                  backgroundSize: "9px",
-                }}
-              >
-                <option value="English">Select Language</option>
-                {languages.map((lang) => (
-                  <option key={lang} value={lang}>
-                    {lang}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
+        {/* Google Translate placeholder */}
+        <div id="google_translate_element" style={{ height: 0, overflow: "hidden" }}></div>
       </div>
-
-      {/* Google Translate placeholder - keep this visible but with zero size */}
-      <div id="google_translate_element" style={{ height: 0, overflow: "hidden" }}></div>
-    </div>
+    </>
   )
 }
 
