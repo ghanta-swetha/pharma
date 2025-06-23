@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 const TopBar = () => {
   const [language, setLanguage] = useState("English")
   const [translatorReady, setTranslatorReady] = useState(false)
+  const [googleTranslateLoaded, setGoogleTranslateLoaded] = useState(false)
 
   const languageMap = {
     Afrikaans: "af",
@@ -146,32 +147,26 @@ const TopBar = () => {
   const languages = Object.keys(languageMap)
 
   useEffect(() => {
-    if (window.google?.translate) {
-      setTranslatorReady(true)
+    // Check if Google Translate is already loaded
+    if (window.google?.translate?.TranslateElement) {
+      initializeTranslateElement()
       return
     }
 
-    window.googleTranslateElementInit = () => {
-      new window.google.translate.TranslateElement(
-        {
-          pageLanguage: "en",
-          includedLanguages: Object.values(languageMap).join(","),
-          autoDisplay: false,
-          layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
-        },
-        "google_translate_element",
-      )
-      setTranslatorReady(true)
-    }
+    // Set up initialization callback
+    window.googleTranslateElementInit = initializeTranslateElement
 
-    const script = document.createElement("script")
-    script.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
-    script.async = true
-    script.defer = true
-    script.onerror = () => {
-      console.error("Failed to load Google Translate script")
+    // Load Google Translate script if not already loaded
+    if (!document.querySelector('script[src*="translate.google.com"]')) {
+      const script = document.createElement("script")
+      script.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
+      script.async = true
+      script.defer = true
+      script.onerror = () => {
+        console.error("Failed to load Google Translate script")
+      }
+      document.body.appendChild(script)
     }
-    document.body.appendChild(script)
 
     return () => {
       if (window.googleTranslateElementInit) {
@@ -179,6 +174,26 @@ const TopBar = () => {
       }
     }
   }, [])
+
+  const initializeTranslateElement = () => {
+    if (!window.google?.translate?.TranslateElement) {
+      console.error("Google Translate API not available")
+      return
+    }
+
+    new window.google.translate.TranslateElement(
+      {
+        pageLanguage: "en",
+        includedLanguages: Object.values(languageMap).join(","),
+        autoDisplay: false,
+        layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
+      },
+      "google_translate_element"
+    )
+
+    setGoogleTranslateLoaded(true)
+    setTranslatorReady(true)
+  }
 
   const handleLanguageChange = (e) => {
     const selectedLang = e.target.value
@@ -190,40 +205,32 @@ const TopBar = () => {
     }
 
     const langCode = languageMap[selectedLang]
+    if (!langCode) return
 
+    // First try the standard method
     try {
-      const translateElement = document.querySelector("#google_translate_element")
-      const iframe = translateElement?.querySelector("iframe")
-      const iframeDoc = iframe?.contentWindow?.document
-      if (iframeDoc) {
-        const dropdown = iframeDoc.querySelector(".goog-te-combo")
-        if (dropdown) {
-          dropdown.value = langCode
-          dropdown.dispatchEvent(new Event("change"))
-          return
-        }
-      }
-    } catch (error) {
-      console.error("Error accessing Google Translate iframe:", error)
-    }
-
-    try {
-      const selectors = [".goog-te-combo", ".skiptranslate .goog-te-combo", "select.goog-te-combo"]
-      let googleSelect = null
-      for (const selector of selectors) {
-        googleSelect = document.querySelector(selector)
-        if (googleSelect) break
-      }
-
+      const googleSelect = document.querySelector(".goog-te-combo")
       if (googleSelect) {
         googleSelect.value = langCode
-        googleSelect.dispatchEvent(new Event("change", { bubbles: true }))
-      } else {
-        document.cookie = `googtrans=/en/${langCode}; path=/; domain=${window.location.hostname}`
-        window.location.reload()
+        googleSelect.dispatchEvent(new Event("change"))
+        return
       }
     } catch (error) {
-      console.error("Error changing language:", error)
+      console.error("Error accessing Google Translate select:", error)
+    }
+
+    // Fallback method using cookies
+    try {
+      document.cookie = `googtrans=/en/${langCode}; path=/; domain=.${window.location.hostname}`
+      
+      // Force a reload if the language doesn't change immediately
+      setTimeout(() => {
+        if (document.querySelector(".goog-te-combo")?.value !== langCode) {
+          window.location.reload()
+        }
+      }, 500)
+    } catch (error) {
+      console.error("Error setting language cookie:", error)
     }
   }
 
