@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from "react"
 
 const TopBar = () => {
-  const [language, setLanguage] = useState("English");
-  const [translatorReady, setTranslatorReady] = useState(false);
-  const [isTranslating, setIsTranslating] = useState(false);
+  const [language, setLanguage] = useState("English")
+  const [translatorReady, setTranslatorReady] = useState(false)
 
   // Comprehensive language map to Google Translate codes
   const languageMap = {
@@ -141,129 +140,106 @@ const TopBar = () => {
     Yiddish: "yi",
     Yoruba: "yo",
     Zulu: "zu",
-  };
+  }
 
-  const languages = Object.keys(languageMap);
+  const languages = Object.keys(languageMap)
 
-  // Load Google Translate script with retry mechanism
-  const loadGoogleTranslate = (attempt = 1) => {
+  // Load Google Translate script once on mount
+  useEffect(() => {
+    // Check if Google Translate is already loaded
     if (window.google?.translate) {
-      setTranslatorReady(true);
-      return;
+      setTranslatorReady(true)
+      return
     }
 
-    // Remove any existing script to prevent duplicates
-    const existingScript = document.querySelector('script[src*="translate.google.com"]');
-    if (existingScript) {
-      document.body.removeChild(existingScript);
+    // Create a global callback function that Google Translate will call
+    window.googleTranslateElementInit = () => {
+      new window.google.translate.TranslateElement(
+        {
+          pageLanguage: "en",
+          includedLanguages: Object.values(languageMap).join(","),
+          autoDisplay: false,
+          layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
+        },
+        "google_translate_element",
+      )
+      setTranslatorReady(true)
     }
 
-    const script = document.createElement("script");
-    script.src = `https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit&_=${Date.now()}`;
-    script.async = true;
-    script.defer = true;
+    // Add Google Translate script
+    const script = document.createElement("script")
+    script.src = "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
+    script.async = true
+    script.defer = true
 
     script.onerror = () => {
-      console.error(`Failed to load Google Translate script (attempt ${attempt})`);
-      if (attempt < 3) {
-        setTimeout(() => loadGoogleTranslate(attempt + 1), 2000);
-      } else {
-        console.warn("Final attempt failed. Using fallback translation method.");
-      }
-    };
+      console.error("Failed to load Google Translate script")
+    }
 
-    document.body.appendChild(script);
-  };
+    document.body.appendChild(script)
 
-  useEffect(() => {
-    // Create callback function
-    window.googleTranslateElementInit = () => {
-      try {
-        new window.google.translate.TranslateElement(
-          {
-            pageLanguage: "en",
-            includedLanguages: Object.values(languageMap).join(","),
-            autoDisplay: false,
-            layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
-          },
-          "google_translate_element"
-        );
-        setTranslatorReady(true);
-      } catch (error) {
-        console.error("Error initializing Google Translate:", error);
-      }
-    };
-
-    loadGoogleTranslate();
-
+    // Cleanup function
     return () => {
       if (window.googleTranslateElementInit) {
-        delete window.googleTranslateElementInit;
+        delete window.googleTranslateElementInit
       }
-    };
-  }, []);
+    }
+  }, [])
 
   const handleLanguageChange = (e) => {
-    const selectedLang = e.target.value;
-    if (selectedLang === language) return;
+    const selectedLang = e.target.value
+    setLanguage(selectedLang)
 
-    setIsTranslating(true);
-    setLanguage(selectedLang);
-    const langCode = languageMap[selectedLang];
+    if (!translatorReady) {
+      console.warn("Google Translate not yet initialized")
+      return
+    }
 
-    // Try multiple translation methods with fallbacks
-    const translateWithFallbacks = async () => {
+    const langCode = languageMap[selectedLang]
+
+    // Direct method to change language using Google Translate API
+    if (window.google?.translate?.TranslateElement) {
+      // Try to use the direct API method first
       try {
-        // Method 1: Direct API if available
-        if (window.google?.translate?.TranslateElement) {
-          try {
-            const translateInstance = new window.google.translate.TranslateElement({
-              pageLanguage: "en",
-              includedLanguages: Object.values(languageMap).join(","),
-              layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE
-            }, "google_translate_element");
-            
-            // This might not work due to iframe security policies
-            setTimeout(() => {
-              const iframe = document.querySelector('#google_translate_element iframe');
-              if (iframe && iframe.contentWindow) {
-                try {
-                  iframe.contentWindow.postMessage({
-                    event: 'changeLanguage',
-                    langCode: langCode
-                  }, 'https://translate.googleapis.com');
-                } catch (e) {
-                  console.warn("Iframe postMessage failed:", e);
-                }
-              }
-            }, 500);
-          } catch (e) {
-            console.warn("Direct API method failed:", e);
+        const translateElement = document.querySelector("#google_translate_element")
+        const iframe = translateElement?.querySelector("iframe")
+        const iframeDoc = iframe?.contentWindow?.document
+
+        if (iframeDoc) {
+          const dropdown = iframeDoc.querySelector(".goog-te-combo")
+          if (dropdown) {
+            dropdown.value = langCode
+            dropdown.dispatchEvent(new Event("change"))
+            return
           }
         }
-
-        // Method 2: Cookie-based approach (most reliable)
-        document.cookie = `googtrans=/en/${langCode}; path=/; domain=${window.location.hostname}`;
-        
-        // Method 3: URL-based translation as final fallback
-        setTimeout(() => {
-          window.location.href = `https://translate.google.com/translate?hl=${langCode}&sl=auto&tl=${langCode}&u=${encodeURIComponent(window.location.href)}`;
-        }, 1000);
-
-        // Reload the page to apply translation
-        setTimeout(() => {
-          window.location.reload();
-        }, 300);
-
       } catch (error) {
-        console.error("Translation failed:", error);
-      } finally {
-        setIsTranslating(false);
+        console.error("Error accessing Google Translate iframe:", error)
       }
-    };
+    }
 
-    translateWithFallbacks();
-  };
+    // Fallback method - find the Google Translate dropdown directly
+    try {
+      // Try multiple selectors as Google might change their structure
+      const selectors = [".goog-te-combo", ".skiptranslate .goog-te-combo", "select.goog-te-combo"]
+
+      let googleSelect = null
+      for (const selector of selectors) {
+        googleSelect = document.querySelector(selector)
+        if (googleSelect) break
+      }
+
+      if (googleSelect) {
+        googleSelect.value = langCode
+        googleSelect.dispatchEvent(new Event("change", { bubbles: true }))
+      } else {
+        // Last resort - use the cookie method
+        document.cookie = `googtrans=/en/${langCode}; path=/`; window.location.reload()
+      }
+    } catch (error) {
+      console.error("Error changing language:", error)
+    }
+  }
 
   return (
     <div className="w-full bg-gray-50 py-2 sm:py-3">
@@ -287,7 +263,6 @@ const TopBar = () => {
               <select
                 value={language}
                 onChange={handleLanguageChange}
-                disabled={isTranslating}
                 className="border border-black bg-white px-2 sm:px-3 py-1 font-roboto text-sm sm:text-base font-semibold appearance-none pr-8 relative cursor-pointer w-full sm:w-[197px]"
                 style={{
                   backgroundImage:
@@ -297,24 +272,18 @@ const TopBar = () => {
                   backgroundSize: "9px",
                 }}
               >
-                {isTranslating ? (
-                  <option value="">Translating...</option>
-                ) : (
-                  <>
-                    <option value="English">Select Language</option>
-                    {languages.map((lang) => (
-                      <option key={lang} value={lang}>
-                        {lang}
-                      </option>
-                    ))}
-                  </>
-                )}
+                <option value="English">Select Language</option>
+                {languages.map((lang) => (
+                  <option key={lang} value={lang}>
+                    {lang}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
         </div>
 
-        {/* Medium screens (md) layout */}
+        {/* Medium screens (md) layout - exactly as in the image */}
         <div className="hidden md:flex md:flex-col md:items-center md:justify-center md:text-center md:space-y-2 lg:hidden">
           {/* Welcome Text */}
           <div className="text-spansules-green font-['Quicksand'] text-base font-bold">Welcome to our SPANSULES</div>
@@ -332,7 +301,6 @@ const TopBar = () => {
               <select
                 value={language}
                 onChange={handleLanguageChange}
-                disabled={isTranslating}
                 className="border border-black bg-white px-3 py-1 font-roboto text-base font-semibold appearance-none pr-8 relative cursor-pointer w-[250px]"
                 style={{
                   backgroundImage:
@@ -342,18 +310,12 @@ const TopBar = () => {
                   backgroundSize: "9px",
                 }}
               >
-                {isTranslating ? (
-                  <option value="">Translating...</option>
-                ) : (
-                  <>
-                    <option value="English">Select Language</option>
-                    {languages.map((lang) => (
-                      <option key={lang} value={lang}>
-                        {lang}
-                      </option>
-                    ))}
-                  </>
-                )}
+                <option value="English">Select Language</option>
+                {languages.map((lang) => (
+                  <option key={lang} value={lang}>
+                    {lang}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -377,7 +339,6 @@ const TopBar = () => {
               <select
                 value={language}
                 onChange={handleLanguageChange}
-                disabled={isTranslating}
                 className="border border-black bg-white px-3 py-1 font-roboto text-base font-semibold appearance-none pr-8 relative cursor-pointer w-[197px]"
                 style={{
                   backgroundImage:
@@ -387,18 +348,12 @@ const TopBar = () => {
                   backgroundSize: "9px",
                 }}
               >
-                {isTranslating ? (
-                  <option value="">Translating...</option>
-                ) : (
-                  <>
-                    <option value="English">Select Language</option>
-                    {languages.map((lang) => (
-                      <option key={lang} value={lang}>
-                        {lang}
-                      </option>
-                    ))}
-                  </>
-                )}
+                <option value="English">Select Language</option>
+                {languages.map((lang) => (
+                  <option key={lang} value={lang}>
+                    {lang}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -408,7 +363,8 @@ const TopBar = () => {
       {/* Google Translate placeholder - keep this visible but with zero size */}
       <div id="google_translate_element" style={{ height: 0, overflow: "hidden" }}></div>
     </div>
-  );
-};
+  )
+}
 
-export default TopBar;
+export default TopBar
+
